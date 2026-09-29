@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MEMORY_404｜Chapter</title><link rel="stylesheet" href="style.css"></head>
+<body><div class="page"><img class="bg" id="chapterBg" src="" alt=""><div class="overlay"></div><div class="topbar"><div><span class="dot"></span>PRIVATE MEMORY ARCHIVE</div><div id="clock">--:--</div></div>
+<div class="chapter-wrap"><div class="chapter-card"><div class="nav-row"><button class="btn back" type="button" onclick="goBack('story.html?c='+getC())">← 回上一頁</button></div><div class="chapter-num" id="num"></div><div class="line" style="margin-left:auto;margin-right:auto"></div>
+<h2 id="title"></h2><p class="muted" id="sub"></p><p class="small">STORY COMPLETE — PUZZLE UNLOCKED</p>
+<button class="btn" id="enter">進入章節</button></div></div></div>
+<script src="data.js"></script><script src="common.js"></script>
+<script>
+const c=getC(), ch=CHAPTERS[c];
+chapterBg.src = ch.image;
+num.textContent = ch.num;
+title.textContent = ch.title;
+sub.textContent = ch.sub;
+enter.onclick = ()=> location.href='puzzle.html?c='+c;
+</script></body></html>

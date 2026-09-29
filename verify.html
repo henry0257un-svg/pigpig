@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MEMORY_404｜Verification</title><link rel="stylesheet" href="style.css"></head>
+<body><div class="page"><img class="bg" id="verifyBg" src="assets/chapter_3.png" alt=""><div class="overlay"></div><div class="topbar"><div><span class="dot"></span>PHYSICAL MEMORY CHECK</div><div id="clock">--:--</div></div>
+<div class="puzzle-wrap"><div class="puzzle-card"><div class="eyebrow" id="verifyLabel"></div><h2 id="verifyTitle"></h2><div class="terminal" id="authBox"></div><div class="clue" id="verifyInstruction"></div><p class="small">請把上方授權碼出示給「記憶保管員」，取得對應的實體記憶。不要翻保管員的袋子。</p><label class="btn camera-btn" for="photoInput">啟動相機進行核對</label><input id="photoInput" class="camera-input" type="file" accept="image/*" capture="environment"><div id="previewWrap" class="photo-preview" style="display:none"><img id="preview" alt="核對照片"></div><div class="msg" id="verifyMsg"></div><button class="btn" id="scanBtn" disabled>開始影像核對</button><button class="btn" id="continueBtn" style="display:none">核對完成｜繼續</button></div></div></div>
+<script src="data.js"></script><script src="common.js"></script><script>
+const q=new URLSearchParams(location.search),g=+(q.get('g')||1);
+const cfg={
+  1:{label:'MEMORY CHECK // 01',title:'第一段實體記憶',code:'M-031',img:'assets/chapter_3.png',instruction:'取得第一份實體記憶後，拍下它完成核對。建議讓大草莓熊與 M404 識別卡一起入鏡。記得保留禮物上的 MEMORY DECODER CARD。',next:'story.html?c=3'},
+  2:{label:'PAIR CHECK // 02',title:'同源副本核對',code:'M-204',img:'assets/chapter_4.png',instruction:'取得第二份實體記憶後，讓「原始記憶」與「縮小副本」同時入鏡。也就是兩隻熊要一起拍。',next:'story.html?c=4'},
+  3:{label:'FINAL MEMORY CHECK',title:'最終實體記憶',code:'M-404',img:'assets/chapter_7.png',instruction:'取得最後一份實體記憶後，請把大草莓熊、小草莓熊與相機三件物品全部放進同一張照片。',next:'final.html'}
+}[g]||null;
+if(!cfg)location.href='index.html';
+verifyBg.src=cfg.img;verifyLabel.textContent=cfg.label;verifyTitle.textContent=cfg.title;authBox.innerHTML=`AUTHORIZATION GRANTED<br>EXTRACTION CODE .... <strong>${cfg.code}</strong>`;verifyInstruction.textContent=cfg.instruction;
+const input=document.getElementById('photoInput'),preview=document.getElementById('preview'),wrap=document.getElementById('previewWrap'),scan=document.getElementById('scanBtn'),cont=document.getElementById('continueBtn'),vmsg=document.getElementById('verifyMsg');
+input.onchange=()=>{if(!input.files||!input.files[0])return;preview.src=URL.createObjectURL(input.files[0]);wrap.style.display='block';scan.disabled=false;vmsg.textContent='照片已取得，等待核對。';};
+scan.onclick=()=>{scan.disabled=true;vmsg.className='msg';vmsg.textContent='SCANNING...';setTimeout(()=>{vmsg.className='msg ok';vmsg.textContent=g===2?'✓ ORIGINAL MATCH / DUPLICATE MATCH / SIMILARITY 92%':'✓ OBJECT MATCH / PHYSICAL MEMORY VERIFIED';cont.style.display='block';},1200);};
+cont.onclick=()=>location.href=cfg.next;
+</script></body></html>

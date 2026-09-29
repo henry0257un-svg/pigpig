@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MEMORY_404｜Puzzle</title><link rel="stylesheet" href="style.css"></head>
+<body><div class="page"><img class="bg" id="puzzleBg" src="" alt=""><div class="overlay"></div><div class="topbar"><div><span class="dot"></span>PRIVATE MEMORY ARCHIVE</div><div id="clock">--:--</div></div>
+<div class="puzzle-wrap"><div class="puzzle-card"><div class="nav-row"><button class="btn back" type="button" onclick="goBack('chapter.html?c='+getC())">← 回上一頁</button></div>
+<div class="eyebrow" id="label"></div><h2 id="title"></h2>
+<div class="progress-row"><span>RECOVERY</span><span id="pt"></span></div><div class="progress"><span id="pb"></span></div>
+<div class="terminal" id="terminal"></div><div id="game"></div><div class="msg" id="msg"></div>
+<button class="btn ghost" id="hint">需要提示</button><div class="msg" id="hintMsg"></div></div></div></div>
+<script src="data.js"></script><script src="common.js"></script>
+<script>
+const c=getC(), ch=CHAPTERS[c], p=ch.puzzle;
+puzzleBg.src=ch.image; label.textContent=p.label; title.textContent=p.title; pt.textContent=ch.progress+'%'; pb.style.width=ch.progress+'%'; terminal.innerHTML=p.terminal; hint.onclick=()=>hintMsg.textContent=p.hint||'目前沒有更多提示。';
+const game=document.getElementById('game'), msg=document.getElementById('msg');
+const okMsg=t=>{msg.textContent=t;msg.className='msg ok'}; const errMsg=t=>{msg.textContent=t;msg.className='msg err'};
+const nextChapter=()=>setTimeout(()=>{ if(c<CHAPTERS.length-1) location.href='story.html?c='+(c+1); else location.href='final.html'; },500);
+
+function renderBasic(){
+  game.innerHTML=`<div class="clue">${p.clue}</div><textarea class="input" id="answer" rows="1" placeholder="${p.placeholder||'輸入答案'}"></textarea><button class="btn" id="submit">提交答案</button>`;
+  document.getElementById('submit').onclick=()=>{const v=document.getElementById('answer').value.trim();if(!matches(v,p.answers||[])){errMsg('答案似乎不對，再想一下。');return;}okMsg('✓ 記憶碎片已恢復');nextChapter();};
+}
+
+function renderGift1(){
+  const rotations=[90,180,270,90,180,270];
+  let state=[...rotations];
+  game.innerHTML=`<div class="clue"><strong>第一層｜修復影像</strong><br>點擊每個碎片旋轉 90°，直到整張影像方向一致。</div><div class="tile-board" id="tileBoard"></div><div id="stage2" style="display:none"><div class="clue"><strong>第二層｜位移解碼</strong><br>DECODER KEY：<code>SHIFT -3</code><br><br><span class="cipher-text">VWUDZEHUUB</span><br><br>每個英文字母都往回移 3 格，解出真正的記憶關鍵字。</div><input class="input" id="cipherAnswer" placeholder="輸入解密結果"><button class="btn" id="gift1Submit">驗證解密結果</button></div>`;
+  const board=document.getElementById('tileBoard');
+  for(let i=0;i<6;i++){
+    const t=document.createElement('button'); t.className='img-tile'; t.type='button';
+    const col=i%3,row=Math.floor(i/3); t.style.backgroundImage=`url('${ch.image}')`; t.style.backgroundPosition=`${col*50}% ${row*100}%`; t.style.transform=`rotate(${state[i]}deg)`;
+    t.onclick=()=>{state[i]=(state[i]+90)%360;t.style.transform=`rotate(${state[i]}deg)`;if(state.every(v=>v===0)){okMsg('✓ 影像方向已修復，第二層解碼已開放。');document.getElementById('stage2').style.display='block';}};
+    board.appendChild(t);
+  }
+  document.getElementById('gift1Submit').onclick=()=>{};
+  setTimeout(()=>{document.getElementById('gift1Submit').onclick=()=>{const v=document.getElementById('cipherAnswer').value;if(!matches(v,['STRAWBERRY','草莓'])){errMsg('位移結果不正確。記得每個字母往回 3 格。');return;}localStorage.setItem('memory404_gift1','1');location.href='verify.html?g=1';};},0);
+}
+
+function renderGift2(){
+  const targets=[[4,3],[3,2],[1,1],[3,1],[3,1]], symbols=[['▣','▢'],['◆','◇'],['●','○'],['▲','△'],['■','□']];
+  let round=0,coords=[];
+  game.innerHTML=`<div class="clue"><strong>第一層｜找出異常點</strong><br>每一頁只有一個符號不同。找出它，系統會記錄它的座標（列、欄）。</div><div class="odd-meta" id="oddMeta"></div><div class="odd-grid" id="oddGrid"></div><div id="polyStage" style="display:none"><div class="clue"><strong>第二層｜座標解碼</strong><br>妳得到的座標：<code id="coordText"></code><br><br>請拿第一份禮物上的 <strong>MEMORY DECODER CARD</strong>，依序查出五個字母。</div><input class="input" id="polyAnswer" placeholder="輸入五個英文字母"><button class="btn" id="polySubmit">驗證結果</button></div>`;
+  function drawRound(){
+    oddMeta.textContent=`異常偵測 ${round+1} / 5`;
+    oddGrid.innerHTML=''; const [r,cx]=targets[round], [normal,odd]=symbols[round];
+    for(let r0=1;r0<=5;r0++)for(let c0=1;c0<=5;c0++){
+      const b=document.createElement('button');b.className='odd-cell';b.textContent=(r0===r&&c0===cx)?odd:normal;
+      b.onclick=()=>{if(r0===r&&c0===cx){coords.push(`${r}${cx}`);round++; if(round<5){okMsg(`✓ 座標 ${r}${cx} 已記錄`);drawRound();}else{okMsg('✓ 五組座標已完整復原');document.getElementById('coordText').textContent=coords.join('  ');document.getElementById('polyStage').style.display='block';}}else{errMsg('這個符號仍屬於正常資料。再找一個細微不同的。');}};
+      oddGrid.appendChild(b);
+    }
+  }
+  drawRound();
+  document.getElementById('polySubmit').onclick=()=>{};
+  setTimeout(()=>{document.getElementById('polySubmit').onclick=()=>{const v=document.getElementById('polyAnswer').value;if(!matches(v,['SMALL','小'])){errMsg('座標解碼不正確。記得座標順序是「列、欄」。');return;}localStorage.setItem('memory404_gift2','1');location.href='verify.html?g=2';};},0);
+}
+
+function renderTimeline(){
+  const cards=[
+    {id:'C',text:'天空轉成藍紫色，商店招牌開始亮起。',digit:'4'},
+    {id:'A',text:'天空仍亮，路燈尚未亮起。',digit:'4'},
+    {id:'D',text:'夜色完全降下，城市燈光成為主角。',digit:'7'},
+    {id:'B',text:'第一盞路燈亮起，天空仍帶一點橘色。',digit:'0'}
+  ];
+  let selected=[];
+  game.innerHTML=`<div class="clue">依照「最早 → 最晚」的順序點選四個片段。選錯可按重設。</div><div class="timeline-grid" id="timeGrid"></div><div class="selected-order" id="selectedOrder">尚未選擇</div><button class="btn ghost" id="resetTime">重設順序</button>`;
+  const grid=document.getElementById('timeGrid'), order=document.getElementById('selectedOrder');
+  cards.forEach(card=>{const b=document.createElement('button');b.className='time-card';b.innerHTML=`<span>${card.text}</span>`;b.onclick=()=>{if(selected.includes(card.id))return;selected.push(card.id);b.classList.add('chosen');order.textContent='目前順序：'+selected.join(' → ');if(selected.length===4){if(selected.join('')==='ABCD'){localStorage.setItem('memory404_fragmentKey','4047');okMsg('✓ 時間順序正確。Fragment Key：4047（請記住）');order.innerHTML='FRAGMENT KEY：<strong>4047</strong><br><br><button class="btn" id="timeNext">儲存並繼續</button>';document.getElementById('timeNext').onclick=nextChapter;}else{errMsg('時間順序不正確。請重設後再試。');}}};grid.appendChild(b);});
+  resetTime.onclick=()=>{selected=[];order.textContent='尚未選擇';document.querySelectorAll('.time-card').forEach(x=>x.classList.remove('chosen'));msg.textContent='';};
+}
+
+function renderFrequency(){
+  game.innerHTML=`<div class="clue"><strong>訊號校正</strong><br>系統名稱就是參考頻率。拖動滑桿，讓雜訊完全消失。</div><div class="signal-box"><div class="signal-noise" id="signalNoise">X#%M?E!M_?0?4 /// DATA LOST</div><div class="signal-secret" id="signalSecret">A1Z26</div></div><input class="range" id="freq" type="range" min="350" max="460" value="370"><div class="range-readout" id="freqStatus">SIGNAL：LOST</div><button class="btn" id="lockFreq" disabled>鎖定頻率</button>`;
+  const slider=document.getElementById('freq'), noise=document.getElementById('signalNoise'), secret=document.getElementById('signalSecret'), status=document.getElementById('freqStatus'), lock=document.getElementById('lockFreq');
+  function update(){const v=+slider.value,d=Math.abs(v-404);noise.style.opacity=Math.min(1,d/35);noise.style.filter=`blur(${Math.min(5,d/10)}px)`;secret.style.opacity=d<18?1-d/18:0;if(d<=2){status.textContent='SIGNAL：LOCKED';lock.disabled=false;}else if(d<12){status.textContent='SIGNAL：VERY CLOSE';lock.disabled=true;}else if(v<404){status.textContent='SIGNAL：LOW';lock.disabled=true;}else{status.textContent='SIGNAL：HIGH';lock.disabled=true;}}
+  slider.oninput=update;update();
+  lock.onclick=()=>{localStorage.setItem('memory404_decoder','A1Z26');okMsg('✓ 解碼模式已恢復：A1Z26（A=01、B=02、C=03…）');lock.textContent='儲存並繼續';lock.disabled=false;lock.onclick=nextChapter;};
+}
+
+function renderFinal(){
+  game.innerHTML=`<div class="clue"><strong>第一層｜光學修復</strong><br>調整焦點、曝光與雜訊。當三項都顯示 LOCKED，最後資料才會顯示。</div><div class="camera-frame"><img id="finalImg" src="${ch.image}"><div class="grain-layer" id="grainLayer"></div></div><div class="slider-row"><label>FOCUS <span id="focusStatus">LOST</span></label><input class="range" id="focus" type="range" min="0" max="100" value="35"></div><div class="slider-row"><label>EXPOSURE <span id="expStatus">LOW</span></label><input class="range" id="exposure" type="range" min="0" max="100" value="25"></div><div class="slider-row"><label>GRAIN <span id="grainStatus">HIGH</span></label><input class="range" id="grain" type="range" min="0" max="100" value="75"></div><div id="finalDecode" style="display:none"><div class="clue"><strong>影像修復完成</strong><br>RECOVERED DATA：<code>03 01 13 05 18 01</code><br>DECODER MODE：<code id="decoderMode"></code></div><input class="input" id="wordAnswer" placeholder="解出六個英文字母"><button class="btn" id="wordSubmit">驗證文字</button><div id="keyStage" style="display:none"><div class="clue">最後還缺一段驗證資料：<br><strong>輸入 CHAPTER 05 得到的 Fragment Key</strong></div><input class="input" id="keyAnswer" placeholder="4 位數 Fragment Key"><button class="btn" id="keySubmit">取得最終授權</button></div></div>`;
+  const img=document.getElementById('finalImg'), layer=document.getElementById('grainLayer'), f=document.getElementById('focus'), e=document.getElementById('exposure'), g=document.getElementById('grain');
+  function stat(v,lo,hi,lowTxt,highTxt){v=+v;return v<lo?lowTxt:v>hi?highTxt:'LOCKED';}
+  function update(){const fs=stat(f.value,68,84,'LOST','OVER'),es=stat(e.value,55,70,'LOW','HIGH'),gs=stat(g.value,20,36,'LOW','HIGH');focusStatus.textContent=fs;expStatus.textContent=es;grainStatus.textContent=gs;img.style.filter=`blur(${Math.max(0,(75-f.value)/14)}px) brightness(${0.55+(+e.value/100)})`;layer.style.opacity=(+g.value/100)*0.75;if(fs==='LOCKED'&&es==='LOCKED'&&gs==='LOCKED')document.getElementById('finalDecode').style.display='block';}
+  [f,e,g].forEach(x=>x.oninput=update);update();
+  decoderMode.textContent=localStorage.getItem('memory404_decoder')||'A1Z26';
+  wordSubmit.onclick=()=>{const v=wordAnswer.value;if(!matches(v,['CAMERA','相機'])){errMsg('解碼結果不正確。A=01、B=02、C=03……');return;}okMsg('✓ 最後物件名稱已確認');keyStage.style.display='block';};
+  keySubmit.onclick=()=>{
+  const v=keyAnswer.value.trim();
+  const saved=localStorage.getItem('memory404_fragmentKey')||'4047';
+  if(v!==saved){
+    errMsg('Fragment Key 不正確。回想時間排序完成後得到的 4 位數。');
+    return;
+  }
+  localStorage.setItem('memory404_finalReady','1');
+  okMsg('✓ FINAL AUTHORIZATION GRANTED');
+  keyAnswer.disabled=true;
+  keySubmit.style.display='none';
+
+  const nextBtn=document.createElement('button');
+  nextBtn.className='btn';
+  nextBtn.textContent='下一頁｜進行最終實體核對';
+  nextBtn.onclick=()=>location.href='verify.html?g=3';
+  keyStage.appendChild(nextBtn);
+};
+}
+
+if(p.type==='basic')renderBasic();
+else if(p.type==='gift1')renderGift1();
+else if(p.type==='gift2')renderGift2();
+else if(p.type==='timeline')renderTimeline();
+else if(p.type==='frequency')renderFrequency();
+else if(p.type==='final')renderFinal();
+</script></body></html>

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MEMORY_404｜Recovered</title><link rel="stylesheet" href="style.css"></head>
+<body><div class="page"><img class="bg" src="assets/chapter_7.png" alt=""><div class="overlay"></div><div class="topbar"><div><span class="dot"></span>PRIVATE MEMORY ARCHIVE</div><div id="clock">--:--</div></div>
+<div class="center-card"><div class="glass final-box"><div class="nav-row" style="justify-content:center"><button class="btn back inline" type="button" onclick="goBack('verify.html?g=3')">← 回上一頁</button></div><div class="eyebrow">RECOVERY // 100%</div><h2>所有記憶都找回來了</h2>
+<div class="terminal" id="term">VERIFYING TIMESTAMP...<br>ERROR: DATE DOES NOT EXIST</div>
+<button class="btn" id="reveal">查看異常</button>
+<div id="text" style="display:none">
+<p class="lead">等等。</p><p class="lead">這些並不是「遺失的過去」。</p><p class="muted">因為它們的時間，都還沒有發生。</p>
+<div class="line" style="margin-left:auto;margin-right:auto"></div>
+<p class="muted">🍓 是以後某一天，會讓妳想起彼此的熟悉味道。<br><br>🧸 是會陪著妳走很多地方的小小記憶。<br><br>📷 是準備留下那些還沒有發生的故事。</p>
+<p class="lead">這不是一場記憶復原。</p>
+<p class="lead">是我們正在開始建立新的記憶。</p>
+<div class="heart">❤️</div>
+
+<div class="final-letter">
+  <p>嘿，王泥泥，恭喜你挑戰成功
+  <br><br>首先祝你生日快樂，在21這一年裡你經歷了大大小小的事情，有人離去有人加入
+  <br><br>有EMO也有開心
+  <br><br>有為開學煩惱的你，有努力睡覺的你，也有努力克服恐懼活下來的你，
+  <br><br>這些我都記得我也都有看見並好好地記錄下來
+  <br><br>22年，希望你能更加勇敢，當然如果害怕了就回頭
+  <br><br>我一直都在你身後，是你最堅強可靠的後盾
+  <br><br>你的小太陽從不食言，若未來害怕就抱著健健康康，他們會替我給你勇氣
+  <br><br>要記得爹地媽咪說過的話，在任何人面前你就是你，王晴妏就王晴妏
+  <br><br>喜歡你三個字太常說了這次就不說了，願你22年平平安安事事順利健健康康。</p>
+
+  <p class="poem">王家有女笑如花，
+  <br><br>晴日勤學伴晚霞。
+  <br><br>妏賞直播樂傳說，
+  <br><br>請君託付不須愁。
+  <br><br>勇於發聲心無懼，
+  <br><br>敢迎風雨向前走。</p>
+</div>
+<p class="small">記得看看相機相簿</p>
+<button class="btn" id="pigArchiveBtn" type="button" onclick="location.href='pig-memory.html'">最後一頁｜開啟記憶節點</button>
+</div></div></div></div>
+<script src="common.js"></script>
+<script>
+document.getElementById('reveal').onclick = function(){
+  document.getElementById('reveal').style.display='none';
+  document.getElementById('term').innerHTML='TIMESTAMP: FUTURE<br>STATUS: NOT LOST — NOT CREATED YET';
+  document.getElementById('text').style.display='block';
+};
+</script></body></html>

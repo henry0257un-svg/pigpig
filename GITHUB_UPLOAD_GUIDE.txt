@@ -1,0 +1,38 @@
+MEMORY_404 — GitHub Pages Ready
+
+這份版本已把圖片壓縮，HTML/CSS/JS 路徑保持原本結構。
+
+【請勿把 assets 裡的圖片搬到根目錄，也不用修改程式碼路徑】
+
+上傳結構必須是：
+index.html
+story.html
+chapter.html
+puzzle.html
+camera.html
+final.html
+style.css
+data.js
+common.js
+.nojekyll
+assets/
+  cover.png
+  chapter_1.png ... chapter_7.png
+  story/
+    c1_s1.png ...
+    c7_s2.png
+
+GitHub 網頁版上傳：
+1. 解壓縮本 ZIP。
+2. 進入你的 Repository。
+3. Add file → Upload files。
+4. Windows 檔案總管開啟解壓縮後的 MEMORY_404_GITHUB_READY。
+5. Ctrl+A 全選裡面的內容，直接拖到 GitHub Upload files 的拖曳區。
+   注意：拖的是資料夾「裡面的內容」，不是 ZIP。
+6. 等待所有檔案出現在上傳清單。
+7. Commit changes。
+8. Settings → Pages → Deploy from a branch → main → /(root) → Save。
+9. 等待 Pages 部署完成後重新整理網站。
+
+若 GitHub 網頁仍不接受資料夾拖曳，可使用 GitHub Desktop：
+Add existing repository / 建立 repository → 把這份資料夾內容放入 repo → Commit → Push origin。

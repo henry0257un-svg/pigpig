@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>MEMORY_404｜Pig Archive</title>
+<style>
+:root{
+  --bg:#05070a;--panel:rgba(12,15,22,.84);--line:rgba(255,255,255,.12);
+  --text:#f5f7fb;--muted:#9399aa;--pink:#ff668e;--pink2:#ff9ab5;
+  --cyan:#83ddff;--ok:#8ff0b1;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","PingFang TC",sans-serif}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 45%,rgba(255,102,142,.12),transparent 28%),linear-gradient(180deg,#040609,#080b11 66%,#040609)}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;opacity:.085;background:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px);background-size:100% 4px}
+#stage{position:fixed;inset:0;width:100%;height:100%;touch-action:none;cursor:grab}
+#stage.dragging{cursor:grabbing}
+.topbar{position:fixed;z-index:10;left:18px;right:18px;top:16px;display:flex;align-items:flex-start;justify-content:space-between;gap:18px;pointer-events:none}
+.brand{pointer-events:auto}.eyebrow{font:700 11px/1.3 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.24em;color:var(--pink2);margin-bottom:7px}
+h1{font-size:clamp(24px,5vw,42px);line-height:1;margin:0 0 8px;letter-spacing:-.035em}
+.subtitle{max-width:510px;color:var(--muted);font-size:13px;line-height:1.6}
+.status{pointer-events:auto;text-align:right;font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:#cbd0dc;background:rgba(5,7,10,.52);border:1px solid var(--line);backdrop-filter:blur(10px);padding:10px 12px;border-radius:14px}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--pink);box-shadow:0 0 14px var(--pink);margin-right:7px}
+.hint{position:fixed;z-index:8;left:50%;bottom:22px;transform:translateX(-50%);width:min(92vw,620px);background:rgba(8,10,15,.72);border:1px solid var(--line);backdrop-filter:blur(14px);border-radius:18px;padding:13px 16px;text-align:center;color:#d9dce6;font-size:13px;line-height:1.6;pointer-events:none}
+.hint strong{color:white}.node-label{position:fixed;z-index:7;display:none;pointer-events:none;transform:translate(-50%,-145%);padding:7px 9px;border-radius:10px;background:rgba(9,11,17,.88);border:1px solid rgba(255,255,255,.14);font:700 11px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;color:white;white-space:nowrap}
+.back{position:fixed;z-index:12;left:18px;bottom:18px;background:rgba(18,22,32,.9);border:1px solid var(--line)}
+.done-badge{position:fixed;z-index:12;right:18px;bottom:18px;display:none;background:rgba(12,20,17,.92);border:1px solid rgba(143,240,177,.35);color:var(--ok);padding:12px 14px;border-radius:14px;font:700 12px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em}
+.done-badge.show{display:block}
+.btn{appearance:none;border:0;border-radius:14px;padding:13px 16px;background:var(--pink);color:#fff;font-weight:800;font-size:14px;cursor:pointer}.btn.secondary{background:#181c27;border:1px solid var(--line)}
+.scan{position:fixed;z-index:4;inset:0;pointer-events:none;background:linear-gradient(90deg,transparent 48%,rgba(112,217,255,.035) 50%,transparent 52%);animation:scan 6s linear infinite}@keyframes scan{from{transform:translateX(-60%)}to{transform:translateX(60%)}}
+
+/* Adaptive memory modal: no fixed 16:9 crop. */
+.modal{position:fixed;z-index:30;inset:0;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.64);backdrop-filter:blur(8px)}
+.modal.open{display:flex}
+.modal-card{width:auto;min-width:min(92vw,330px);max-width:96vw;max-height:92vh;overflow:auto;background:#0b0e15;border:1px solid rgba(255,255,255,.14);border-radius:24px;box-shadow:0 30px 100px rgba(0,0,0,.65);transition:width .22s ease}
+.modal-media{display:flex;align-items:center;justify-content:center;width:100%;background:#05070a;border-radius:24px 24px 0 0;overflow:hidden}
+.modal-image{display:block;width:auto;height:auto;max-width:94vw;max-height:62vh;object-fit:contain;background:#05070a}
+.modal-content{padding:22px;max-width:900px;margin:0 auto}.modal-kicker{font:700 11px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.2em;color:var(--pink2);margin-bottom:8px}.modal h2{font-size:28px;margin:0 0 10px}.modal p{color:#c5c9d4;line-height:1.85;margin:0 0 16px}.actions{display:flex;gap:10px;flex-wrap:wrap}
+@media(max-width:640px){.topbar{left:14px;right:14px;top:12px}.subtitle{max-width:250px;font-size:11px}.status{font-size:10px;padding:8px 9px}.hint{bottom:74px;font-size:12px}.back{left:14px;bottom:14px}.done-badge{right:14px;bottom:14px}.modal{padding:10px}.modal-card{max-height:88vh}.modal-image{max-width:96vw;max-height:56vh}.modal h2{font-size:23px}.modal-content{padding:18px}}
+</style>
+</head>
+<body>
+<canvas id="stage"></canvas><div class="scan"></div>
+<div class="topbar"><div class="brand"><div class="eyebrow">MEMORY NODE // FINAL</div><h1>PIG ARCHIVE</h1><div class="subtitle">最後一頁。拖曳旋轉立體點線豬頭，點擊發光節點查看保存下來的照片與文字。</div></div><div class="status"><span class="dot"></span>ARCHIVE ONLINE<br><span id="readCount">0 / 5</span> NODES OPENED</div></div>
+<div class="hint"><strong>操作：</strong>拖曳旋轉・點擊粉色節點・照片會依原始比例完整顯示</div>
+<div class="node-label" id="nodeLabel"></div>
+<button class="btn secondary back" onclick="location.href='final.html'">← 回 100% 結局</button>
+<div class="done-badge" id="doneBadge">ARCHIVE COMPLETE // 5 / 5</div>
+<div class="modal" id="modal"><div class="modal-card" id="modalCard"><div class="modal-media"><img class="modal-image" id="modalImage" src="" alt=""></div><div class="modal-content"><div class="modal-kicker" id="modalKicker"></div><h2 id="modalTitle"></h2><p id="modalText"></p><div class="actions"><button class="btn" id="markBtn">完成閱讀</button><button class="btn secondary" id="closeBtn">關閉</button></div></div></div></div>
+<script>
+const canvas=document.getElementById('stage'),ctx=canvas.getContext('2d'),label=document.getElementById('nodeLabel'),readCount=document.getElementById('readCount'),doneBadge=document.getElementById('doneBadge');
+let W=innerWidth,H=innerHeight,DPR=Math.min(devicePixelRatio||1,2);function resize(){W=innerWidth;H=innerHeight;DPR=Math.min(devicePixelRatio||1,2);canvas.width=W*DPR;canvas.height=H*DPR;canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(DPR,0,0,DPR,0,0)}addEventListener('resize',resize);resize();
+const points=[],edges=[];function addPoint(x,y,z,group='head'){points.push({x,y,z,group});return points.length-1}function addEdge(a,b){edges.push([a,b])}
+function ellipsoid(cx,cy,cz,rx,ry,rz,latCount,lonCount,group,latMin=-Math.PI/2,latMax=Math.PI/2){const grid=[];for(let i=0;i<=latCount;i++){const lat=latMin+(latMax-latMin)*(i/latCount),row=[];for(let j=0;j<lonCount;j++){const lon=(j/lonCount)*Math.PI*2;row.push(addPoint(cx+rx*Math.cos(lat)*Math.sin(lon),cy+ry*Math.sin(lat),cz+rz*Math.cos(lat)*Math.cos(lon),group))}grid.push(row)}for(let i=0;i<grid.length;i++)for(let j=0;j<lonCount;j++){addEdge(grid[i][j],grid[i][(j+1)%lonCount]);if(i<grid.length-1){addEdge(grid[i][j],grid[i+1][j]);if(j%2===0)addEdge(grid[i][j],grid[i+1][(j+1)%lonCount])}}}
+function ring3D(cx,cy,cz,rx,ry,segments,group='detail'){let first=null,prev=null;for(let i=0;i<segments;i++){const a=(i/segments)*Math.PI*2,idx=addPoint(cx+rx*Math.cos(a),cy+ry*Math.sin(a),cz,group);if(first===null)first=idx;if(prev!==null)addEdge(prev,idx);prev=idx}addEdge(prev,first)}
+function triangularSurface(A,B,C,steps,group,zBow=0){const rows=[];for(let r=0;r<=steps;r++){const t=r/steps,row=[];const L={x:A.x*(1-t)+C.x*t,y:A.y*(1-t)+C.y*t,z:A.z*(1-t)+C.z*t},R={x:B.x*(1-t)+C.x*t,y:B.y*(1-t)+C.y*t,z:B.z*(1-t)+C.z*t};const count=steps-r+1;for(let k=0;k<count;k++){const q=count===1?0:k/(count-1),bow=zBow*Math.sin(Math.PI*t)*(1-Math.abs(q-.5)*1.5);row.push(addPoint(L.x*(1-q)+R.x*q,L.y*(1-q)+R.y*q,L.z*(1-q)+R.z*q+bow,group))}rows.push(row)}for(let r=0;r<rows.length;r++)for(let k=0;k<rows[r].length;k++){if(k<rows[r].length-1)addEdge(rows[r][k],rows[r][k+1]);if(r<rows.length-1){const n=rows[r+1];addEdge(rows[r][k],n[Math.min(k,n.length-1)]);if(k>0&&n[Math.min(k-1,n.length-1)]!==undefined)addEdge(rows[r][k],n[Math.min(k-1,n.length-1)])}}}
+
+/* Reference-inspired pig: large round head, wide folded ears, oval eyes, protruding snout. */
+ellipsoid(0,-.04,0,1.68,1.43,1.50,18,34,'head');
+ellipsoid(0,-.27,1.38,.86,.57,.52,10,24,'snout');
+// snout front rim + nostrils
+ring3D(0,-.27,1.88,.71,.42,28,'snoutRim');
+ring3D(-.29,-.27,1.91,.17,.14,14,'nostril');ring3D(.29,-.27,1.91,.17,.14,14,'nostril');
+// eyes, denser oval wire meshes
+ellipsoid(-.52,.27,1.34,.16,.23,.09,5,14,'eye');ellipsoid(.52,.27,1.34,.16,.23,.09,5,14,'eye');
+// brow / cheek contour accents
+ring3D(-.53,.25,1.43,.23,.31,18,'eyeRim');ring3D(.53,.25,1.43,.23,.31,18,'eyeRim');
+
+function ear(sign){
+  const A={x:sign*.42,y:1.02,z:.10},B={x:sign*1.55,y:1.08,z:-.02},C={x:sign*1.45,y:2.18,z:.12};
+  triangularSurface(A,B,C,10,'earOuter',.10);
+  // inner ear, slightly forward and smaller
+  const Ai={x:sign*.63,y:1.18,z:.19},Bi={x:sign*1.38,y:1.22,z:.14},Ci={x:sign*1.34,y:1.91,z:.24};
+  triangularSurface(Ai,Bi,Ci,7,'earInner',.06);
+  // outer curl/edge accent
+  const edge=[A,B,C,A];let prev=null;edge.forEach((p,i)=>{const idx=addPoint(p.x,p.y,p.z+.06,'earEdge');if(prev!==null)addEdge(prev,idx);prev=idx});
+}
+ear(-1);ear(1);
+// lower head/jaw contour to enhance volume
+ring3D(0,-.52,1.25,1.05,.66,30,'cheek');
+
+const memories=[
+{id:'earL',label:'NODE 01',pos:{x:-1.18,y:1.62,z:.30},title:'起點',image:'assets/chapter_1.png',text:'有些記憶並不是突然出現的。它們只是一直待在某個角落，等一個人重新看見。'},
+{id:'earR',label:'NODE 02',pos:{x:1.18,y:1.62,z:.30},title:'第一次異常',image:'assets/chapter_3.png',text:'當記憶開始變成實體，事情就不再只是螢幕裡的遊戲。這一刻開始，虛構與現實有了交界。'},
+{id:'eyeL',label:'NODE 03',pos:{x:-.52,y:.27,z:1.48},title:'被保存的畫面',image:'assets/chapter_5.png',text:'照片留下的是光，但真正被留下來的，是當時的人、表情，以及那一刻的距離。'},
+{id:'eyeR',label:'NODE 04',pos:{x:.52,y:.27,z:1.48},title:'沒有時間戳的記憶',image:'assets/chapter_6.png',text:'如果沒有日期、沒有地點，我們還能認出一段記憶嗎？也許答案一直藏在細節裡。'},
+{id:'snout',label:'NODE 05',pos:{x:0,y:-.26,z:1.98},title:'最後的檔案',image:'assets/chapter_7.png',text:'最後的記憶沒有消失。它只是還沒有發生。接下來要保存的，不再是系統產生的資料，而是你們真的會一起經歷的瞬間。'}];
+let rotX=-.04,rotY=.10,targetRotX=rotX,targetRotY=rotY,dragging=false,lastX=0,lastY=0,startX=0,startY=0,auto=true,hovered=null;
+const opened=new Set(JSON.parse(localStorage.getItem('pigArchiveOpened')||'[]'));function updateOpened(){readCount.textContent=`${opened.size} / ${memories.length}`;if(opened.size>=memories.length)doneBadge.classList.add('show');localStorage.setItem('pigArchiveOpened',JSON.stringify([...opened]))}updateOpened();
+function rotate3(p){let x=p.x*Math.cos(rotY)+p.z*Math.sin(rotY),z=-p.x*Math.sin(rotY)+p.z*Math.cos(rotY),y=p.y*Math.cos(rotX)-z*Math.sin(rotX),z2=p.y*Math.sin(rotX)+z*Math.cos(rotX);return{x,y,z:z2}}
+function project(p){const r=rotate3(p),camera=4.9,scale=Math.min(W,H)*.62,depth=camera-r.z,f=scale/depth;return{x:W/2+r.x*f,y:H/2-r.y*f+.03*H,z:r.z,scale:f}}
+function groupStyle(g,z){const front=Math.max(0,Math.min(1,(z+2.0)/4.2));if(g==='earInner')return{c:`rgba(255,122,160,${.30+front*.48})`,r:1.45};if(g==='eye'||g==='eyeRim')return{c:`rgba(170,205,235,${.22+front*.42})`,r:1.2};if(g==='nostril'||g==='snoutRim')return{c:`rgba(255,150,180,${.32+front*.48})`,r:1.55};return{c:`rgba(205,226,255,${.17+front*.44})`,r:1.1}}
+function draw(){ctx.clearRect(0,0,W,H);if(!dragging&&auto)targetRotY+=.0015;rotX+=(targetRotX-rotX)*.10;rotY+=(targetRotY-rotY)*.10;const projected=points.map(project),sortedEdges=edges.map(e=>({a:e[0],b:e[1],z:(projected[e[0]].z+projected[e[1]].z)/2})).sort((a,b)=>a.z-b.z);ctx.lineWidth=1;for(const e of sortedEdges){const a=projected[e.a],b=projected[e.b],ga=points[e.a].group,sty=groupStyle(ga,e.z);ctx.strokeStyle=sty.c;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke()}const ids=[...Array(points.length).keys()].sort((a,b)=>projected[a].z-projected[b].z);for(const i of ids){const p=projected[i],sty=groupStyle(points[i].group,p.z);ctx.fillStyle=sty.c;ctx.beginPath();ctx.arc(p.x,p.y,sty.r,0,Math.PI*2);ctx.fill()}memories.forEach(m=>{const p=project(m.pos);m.screen=p;const isOpen=opened.has(m.id),isHover=hovered===m,pulse=1+Math.sin(performance.now()/310+m.pos.x)*.12;ctx.shadowBlur=isHover?30:20;ctx.shadowColor=isOpen?'#8ff0b1':'#ff668e';ctx.fillStyle=isOpen?'#8ff0b1':'#ff668e';ctx.beginPath();ctx.arc(p.x,p.y,(isHover?7.8:6.1)*pulse,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.strokeStyle='rgba(255,255,255,.78)';ctx.lineWidth=1;ctx.beginPath();ctx.arc(p.x,p.y,12*pulse,0,Math.PI*2);ctx.stroke()});requestAnimationFrame(draw)}requestAnimationFrame(draw);
+function findNode(x,y){let best=null,bestD=27;memories.forEach(m=>{if(!m.screen)return;const d=Math.hypot(x-m.screen.x,y-m.screen.y);if(d<bestD){bestD=d;best=m}});return best}
+canvas.addEventListener('pointerdown',e=>{dragging=true;auto=false;startX=lastX=e.clientX;startY=lastY=e.clientY;canvas.setPointerCapture(e.pointerId);canvas.classList.add('dragging')});canvas.addEventListener('pointermove',e=>{if(dragging){const dx=e.clientX-lastX,dy=e.clientY-lastY;targetRotY+=dx*.008;targetRotX+=dy*.006;targetRotX=Math.max(-1.05,Math.min(1.05,targetRotX));lastX=e.clientX;lastY=e.clientY}const n=findNode(e.clientX,e.clientY);hovered=n;if(n){label.style.display='block';label.style.left=e.clientX+'px';label.style.top=e.clientY+'px';label.textContent=n.label+' · '+n.title}else label.style.display='none'});canvas.addEventListener('pointerup',e=>{const moved=Math.hypot(e.clientX-startX,e.clientY-startY);dragging=false;canvas.classList.remove('dragging');setTimeout(()=>auto=true,2200);const n=findNode(e.clientX,e.clientY);if(n&&moved<12)openMemory(n)});canvas.addEventListener('pointerleave',()=>{hovered=null;label.style.display='none'});
+const modal=document.getElementById('modal'),modalCard=document.getElementById('modalCard'),modalImage=document.getElementById('modalImage'),modalKicker=document.getElementById('modalKicker'),modalTitle=document.getElementById('modalTitle'),modalText=document.getElementById('modalText'),markBtn=document.getElementById('markBtn'),closeBtn=document.getElementById('closeBtn');let currentMemory=null;
+function fitModal(){if(!modalImage.naturalWidth||!modalImage.naturalHeight)return;const maxW=Math.min(innerWidth*.94,980),maxH=innerHeight*(innerWidth<640?.53:.62),ratio=modalImage.naturalWidth/modalImage.naturalHeight;let w=maxW,h=w/ratio;if(h>maxH){h=maxH;w=h*ratio}w=Math.max(Math.min(maxW,w),Math.min(330,maxW));modalImage.style.width=Math.round(w)+'px';modalImage.style.height='auto';modalCard.style.width=Math.round(w)+'px'}
+modalImage.onload=fitModal;addEventListener('resize',()=>{if(modal.classList.contains('open'))fitModal()});
+function openMemory(m){currentMemory=m;modalImage.src=m.image;modalKicker.textContent=m.label;modalTitle.textContent=m.title;modalText.textContent=m.text;markBtn.textContent=opened.has(m.id)?'已完成閱讀':'完成閱讀';modal.classList.add('open');if(modalImage.complete)fitModal()}
+function closeModal(){modal.classList.remove('open')}closeBtn.onclick=closeModal;modal.onclick=e=>{if(e.target===modal)closeModal()};markBtn.onclick=()=>{if(currentMemory){opened.add(currentMemory.id);updateOpened();markBtn.textContent='已完成閱讀';setTimeout(closeModal,260)}};
+</script>
+</body></html>
