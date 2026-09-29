@@ -81,11 +81,11 @@ ear(-1);ear(1);
 ring3D(0,-.52,1.25,1.05,.66,30,'cheek');
 
 const memories=[
-{id:'earL',label:'NODE 01',pos:{x:-1.18,y:1.62,z:.30},title:'起點',image:'assets/chapter_1.png',text:'有些記憶並不是突然出現的。它們只是一直待在某個角落，等一個人重新看見。'},
-{id:'earR',label:'NODE 02',pos:{x:1.18,y:1.62,z:.30},title:'第一次異常',image:'assets/chapter_3.png',text:'當記憶開始變成實體，事情就不再只是螢幕裡的遊戲。這一刻開始，虛構與現實有了交界。'},
-{id:'eyeL',label:'NODE 03',pos:{x:-.52,y:.27,z:1.48},title:'被保存的畫面',image:'assets/chapter_5.png',text:'照片留下的是光，但真正被留下來的，是當時的人、表情，以及那一刻的距離。'},
-{id:'eyeR',label:'NODE 04',pos:{x:.52,y:.27,z:1.48},title:'沒有時間戳的記憶',image:'assets/chapter_6.png',text:'如果沒有日期、沒有地點，我們還能認出一段記憶嗎？也許答案一直藏在細節裡。'},
-{id:'snout',label:'NODE 05',pos:{x:0,y:-.26,z:1.98},title:'最後的檔案',image:'assets/chapter_7.png',text:'最後的記憶沒有消失。它只是還沒有發生。接下來要保存的，不再是系統產生的資料，而是你們真的會一起經歷的瞬間。'}];
+{id:'earL',label:'NODE 01',pos:{x:-1.18,y:1.62,z:.30},title:'起點',image:'chapter_1.png',text:'有些記憶並不是突然出現的。它們只是一直待在某個角落，等一個人重新看見。'},
+{id:'earR',label:'NODE 02',pos:{x:1.18,y:1.62,z:.30},title:'第一次異常',image:'chapter_3.png',text:'當記憶開始變成實體，事情就不再只是螢幕裡的遊戲。這一刻開始，虛構與現實有了交界。'},
+{id:'eyeL',label:'NODE 03',pos:{x:-.52,y:.27,z:1.48},title:'被保存的畫面',image:'chapter_5.png',text:'照片留下的是光，但真正被留下來的，是當時的人、表情，以及那一刻的距離。'},
+{id:'eyeR',label:'NODE 04',pos:{x:.52,y:.27,z:1.48},title:'沒有時間戳的記憶',image:'chapter_6.png',text:'如果沒有日期、沒有地點，我們還能認出一段記憶嗎？也許答案一直藏在細節裡。'},
+{id:'snout',label:'NODE 05',pos:{x:0,y:-.26,z:1.98},title:'最後的檔案',image:'chapter_7.png',text:'最後的記憶沒有消失。它只是還沒有發生。接下來要保存的，不再是系統產生的資料，而是你們真的會一起經歷的瞬間。'}];
 let rotX=-.04,rotY=.10,targetRotX=rotX,targetRotY=rotY,dragging=false,lastX=0,lastY=0,startX=0,startY=0,auto=true,hovered=null;
 const opened=new Set(JSON.parse(localStorage.getItem('pigArchiveOpened')||'[]'));function updateOpened(){readCount.textContent=`${opened.size} / ${memories.length}`;if(opened.size>=memories.length)doneBadge.classList.add('show');localStorage.setItem('pigArchiveOpened',JSON.stringify([...opened]))}updateOpened();
 function rotate3(p){let x=p.x*Math.cos(rotY)+p.z*Math.sin(rotY),z=-p.x*Math.sin(rotY)+p.z*Math.cos(rotY),y=p.y*Math.cos(rotX)-z*Math.sin(rotX),z2=p.y*Math.sin(rotX)+z*Math.cos(rotX);return{x,y,z:z2}}
