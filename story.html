@@ -3,8 +3,47 @@
 <body><div class="page"><img class="bg" id="storyBg" src="" alt=""><div class="overlay"></div><div class="topbar"><div><span class="dot"></span>PRIVATE MEMORY ARCHIVE</div><div id="clock">--:--</div></div>
 <div class="center-card" style="justify-content:flex-end"><div class="glass story-glass"><div class="nav-row"><button class="btn back" id="backBtn" type="button">← 回上一頁</button></div><div class="eyebrow" id="eyebrow"></div><p class="story-line" id="line"></p><p class="story-sub" id="sub"></p><button class="btn secondary" id="next">下一幕</button><p class="small" style="margin-top:14px;text-align:center">TAP TO CONTINUE</p></div></div></div>
 <script src="data.js"></script><script src="common.js"></script><script>
-const c=getC(),ch=CHAPTERS[c];let s=0;storyBg.src=ch.image;
-function render(){const x=ch.scenes[s];eyebrow.textContent=ch.num+' · 第 '+(s+1)+' 幕';line.textContent=x.line;sub.textContent=x.sub;next.textContent=s===ch.scenes.length-1?'故事結束｜前往章節':'下一幕';}
+const c=getC(),ch=CHAPTERS[c];
+let s=0;
+
+function render(){
+
+  const x=ch.scenes[s];
+
+  // 每一幕載入自己的照片
+  const sceneImage =
+    'c'+(c+1)+'_s'+(s+1)+'.png';
+
+  storyBg.onerror = ()=>{
+    storyBg.onerror = null;
+
+    // 如果某幕圖片不存在，就暫時使用章節圖
+    storyBg.src = ch.image;
+  };
+
+  storyBg.src = sceneImage;
+
+  eyebrow.textContent =
+    ch.num+' · 第 '+(s+1)+' 幕';
+
+  line.textContent = x.line;
+
+  sub.textContent = x.sub;
+
+  next.textContent =
+    s===ch.scenes.length-1
+    ? '故事結束｜前往章節'
+    : '下一幕';
+
+  // 預先載入下一幕，切換時比較不會黑一下
+  if(s < ch.scenes.length-1){
+
+    const preload = new Image();
+
+    preload.src =
+      'assets/story/c'+(c+1)+'_s'+(s+2)+'.png';
+  }
+}
 next.onclick=()=>{if(s<ch.scenes.length-1){s++;render();}else location.href='chapter.html?c='+c;};
 backBtn.onclick=()=>{if(s>0){s--;render();}else goBack(c>0?'puzzle.html?c='+(c-1):'index.html');};render();
 </script></body></html>
